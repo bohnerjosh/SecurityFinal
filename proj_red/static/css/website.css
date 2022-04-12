@@ -1,0 +1,135 @@
+
+	.company-slog {
+		color: #dc143c;
+		font-style: italic;
+		display: flex;
+		justify-content: center;
+	}
+
+	.navbar {
+		background-color: white;	
+	}
+
+	.panels {
+		margin-top: 20px;
+		
+	}
+	.panel {
+		background-color: #dc143c;
+	 	margin: 4px;	
+		border: 2px solid yellow;
+	}
+
+	.html-form {
+		padding: 10px;
+		border: solid yellow;
+		margin-top: 10px;
+	}
+
+	.head-contain {
+		color: white;
+		font-weight: bold;
+		margin-top: 100px;	
+	}
+	.head-c {
+
+		color: white;
+		font-weight: bold;
+		margin-bottom: 15px;
+	}
+
+	.product-img {
+		border: 2px solid yellow;
+		display: flex;
+		justify-content: center;
+	}
+
+	.p-description {
+		color: white;
+	}
+	.p-description2 {
+		color: white;
+	}
+
+	.product-h1 {
+		color: white;
+	}
+	.product-h2 {
+		color: white;
+	}
+
+
+	.product-h3 {
+		color: white;
+	}
+	body {
+		background-color: black;
+	}
+
+	.company-logo {
+		margin-left: 500px;
+		margin-top: 70px;
+
+		display: flex;
+		justify-content: center;
+	}
+
+	.loc-head {
+		margin-top: 100px;
+	
+		color: white;	
+		font-weight: bold;
+	}
+
+
+	.loc-desc {
+		color: white;
+	}
+	.loc-map {
+		border: solid yellow;
+	}
+
+	.team {
+		margin-top: 100px;
+	}
+	.employ-img1 {
+		border: solid yellow;
+		display: flex;
+		padding: 10px;
+		justify-content: center;
+	}
+	.employ-img2 {
+		
+		border: solid yellow;
+		display: flex;
+		justify-content: center;
+	}
+
+	.employ-h1 {
+		color: white;
+
+	}
+
+	
+	.employ-h3 {
+		color: white;
+
+	}
+	.employ-h2 {
+		color: white;
+	}
+
+	.employ-d {
+		color: white;
+	}
+
+
+	.contact {
+		margin-top: 100px;
+		font-weight: bold;
+		color: white;
+	}
+	.form-style {
+		color: white;
+	}
+		
