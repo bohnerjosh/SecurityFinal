@@ -3,7 +3,7 @@
   <head>
     <title>CD Projeckt Read</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="website.css">
+<link href="{{ url_for('static', filename='css/website.css') }}" rel="stylesheet">
   </head>
 
   <style>
@@ -49,7 +49,7 @@
   </div>
 </nav>
 	
-<img class="company-logo mx-auto" src="images/proj_red.png">
+<img class="company-logo mx-auto" src="{{ url_for('static', filename='img/proj_red.png') }}">
 <h1 id="home" class="company-slog text-center">Where Gaming Meets Pop Culture</h1>
 
 	<div id="Products" class="container panels">
@@ -58,7 +58,7 @@
 	    <div class="row prod-row mx-auto">
 		<div class="col-xl-3 panel rounded">
 		    <h3 class="product-h1 text-center">Gamer Glove</h3>
-		    <img class="product-img rounded mx-auto" src="images/gamerglove.png" height="325" width="225">
+		    <img class="product-img rounded mx-auto" src="{{ url_for('static', filename='img/gamerglove.png') }}" height="325" width="225">
 		    	
 		    <div class="prod-desc-default text-center">
 		    <p>_____________________________________</p>
@@ -69,7 +69,7 @@
 
 		<div class="col-xl-4 panel rounded"> 
 		    <h3 class="product-h2 text-center">Dino Nuggies</h3>
-		    <img class="product-img rounded mx-auto" src="images/dn.png" height="325" width="225">
+		    <img class="product-img rounded mx-auto" src="{{ url_for('static', filename='img/dn.png') }}" height="325" width="225">
 
 		    <div class="prod-desc-default text-center">
 		    <p>_________________________________________________</p>
@@ -81,7 +81,7 @@
 		<div class="col-xl-4 panel rounded">
 		    
 		    <h3 class="product-h3 text-center">CyberPunk 2077</h3>
-		    <img class="product-img rounded mx-auto" src="images/cyber.jpg" height="325" width="225">
+		    <img class="product-img rounded mx-auto" src="{{ url_for('static', filename='img/Cyber.jpg') }}" height="325" width="225">
 		    <div class="prod-desc-default text-center">
 		    <p>_________________________________________________</p>
 		    <p class="p-description2">Very high quality game for the price.<p>
@@ -101,7 +101,7 @@
 	    <div class="row">
 		<div class="col-sm-12 col-md-4 col-lg-3 panel rounded">
 			<h3 class="employ-h1 text-center">Snas</h3>
-			<img class="employ-img1 rounded mx-auto" src="images/sans.png" height="300" width="170">
+			<img class="employ-img1 rounded mx-auto" src="{{ url_for('static', filename='img/sans.png') }}" height="300" width="170">
 			<div class="employ-d text-center">
 
 			<p>_____________________________________</p>
@@ -115,7 +115,7 @@
 		<div class="col-sm-12 col-md-7 col-lg-4 panel rounded">
 		    
 			<h3 class="employ-h2 text-center">Jeremy Elbertson</h3>
-			<img class="employ-img2 rounded mx-auto" src="images/jermasus.png" height="300" width="300">
+			<img class="employ-img2 rounded mx-auto" src="{{ url_for('static', filename='img/jermasus.png') }}" height="300" width="300">
 			<div class="employ-d text-center">
 
 			<p>_____________________________________</p>
@@ -128,7 +128,7 @@
 		<div class="col-sm-12 col-md-12 col-lg-4 d-block justify-content-center panel rounded">
 		    
 			<h3 class="employ-h3 text-center">Mitten Man Bernie</h3>
-			<img class="employ-img2 mx-auto rounded" src="images/bernie.jpg" height="300" width="300">
+			<img class="employ-img2 mx-auto rounded" src="{{ url_for('static', filename='img/bernie.jpg') }}" height="300" width="300">
 			<div class="employ-d text-center">
 
 			<p>_____________________________________</p>
@@ -145,7 +145,7 @@
 		<div class="col-lg-12 rounded d-block justify-content-center">
 		<h1 class="loc-head text-center">Our Location</h1>
 		<p class="loc-desc text-center">736 Hogldorf Way; Warsaw, Poland</p>
-		<img class="loc-map rounded" src="images/map.png" height="350px" width="1000px">
+		<img class="loc-map rounded" src="{{ url_for('static', filename='img/map.png') }}" height="350px" width="1000px">
 		</div>
 	</div>
 
