@@ -1,0 +1,19 @@
+{% extends "site.html" %}
+
+{% block title %}Entries{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+
+<h2>{{ name }}</h2>
+
+{% for ent in entries: %}
+    <h3>[{{ ent.date_str() }} (#{{ ent.id }}) by {{ ent.username }}]</h3>
+    <p>{{ ent.text }}</p>
+    <p></p>
+
+{% endfor %}
+
+{% endblock %}
