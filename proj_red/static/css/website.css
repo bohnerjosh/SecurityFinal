@@ -26,6 +26,11 @@
 		margin-top: 10px;
 	}
 
+	.html-form {
+		padding: 10px;
+		margin-top: 10px;
+	}
+
 	.head-contain {
 		color: white;
 		font-weight: bold;
@@ -132,4 +137,9 @@
 	.form-style {
 		color: white;
 	}
-		
+    .cowtext {
+        color: white;
+    }	
+    pre {
+        font-family: "Courier New";
+    }	
