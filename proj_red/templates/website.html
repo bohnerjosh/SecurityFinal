@@ -164,7 +164,7 @@
 	<div class="row justify-content-center">
 
 
-<form class="html-form" action="sent.html" method="GET">
+<form class="html-form" action="{{ url_for('message_sent') }}" method="GET">
   <div class="form-group">
     <label class="form-style" for="exampleInputEmail1">Email address</label>
     <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">

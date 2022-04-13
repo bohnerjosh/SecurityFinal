@@ -49,5 +49,31 @@
   </div>
 </nav>
 
+<div id="main-content">
+    <div class="head-contain text-center">
+        <h1 class="cow-title">THE COW</h1>
+    </div>
+        <div class="container">
+            <div class="row justify-content-center">
+                {% if cowtext %}
+                <pre class="cowtext">{{ cowtext }}</pre>
+                {% endif %}
+            </div>
+        </div>
+    <div class="head-contain text-center">
+        <div class="container">
+        <div class="row justify-content-center">
+            <div class="form-group">
+                <form class="html-form-text" action="{{ url_for('process_text') }}" method="POST">
+                <div class="form-group">
+                    <label class="form-style" for="input_text">Enter Text for the cow to say</label>
+                    <input type="text" class="form-control" id="input_text" aria-describeby="textInput" id="input_text" placeholder="Text here..." name="input_text">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div> 
+</div>
+</div>
 </body>
 </html>
