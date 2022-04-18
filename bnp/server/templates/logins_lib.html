@@ -1,0 +1,22 @@
+{% macro login_ui(username) %}
+{% if username %}
+
+    <form class="form-inline my-2 my-lg-0" action="{{ url_for('my_profile') }}">
+    <span class="mx-3">Hello, {{ username }}</span>
+    <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">My Profile</button>
+    </form>
+
+{% else %}
+
+    <form class="form-inline my-2 my-lg-0" action="{{ url_for('login_form') }}">
+    
+    <button class="login-btn btn btn-outline-success my-2 mx-2 my-sm-0" type="submit">Log in</button>
+    </form>
+    <form class="form-inline my-2 my-lg-0" action="{{ url_for('create_profile') }}">
+    <button class="register-btn btn btn-outline-dark my-2 my-sm-0" type="submit">Register</button>
+    </form>
+
+
+{% endif %}
+{% endmacro %}
+

@@ -1,15 +1,27 @@
 from bnp.config import Config
 from bnp.diary import DiaryException, DiaryFactory
 from datetime import datetime
-from flask import Flask, abort, request, jsonify, render_template, url_for, session
+from flask import Flask, abort, request, jsonify, render_template, url_for, session, redirect
 from itsdangerous import URLSafeSerializer
 import os
+from flask_sqlalchemy import SQLAlchemy
+from pathlib import Path
+from sqlalchemy.sql import func, and_
+from werkzeug.utils import secure_filename 
 
 app = Flask(__name__)
 app.secret_key = b'kjlaqetgffrvdup980j3'
 
+sqlite_uri = 'sqlite:///' + os.path.abspath(os.path.curdir) + '/server/Main.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = sqlite_uri
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
 SERVER_CONFIG_ROOT = './.bnp-server'
+UPLOADS_DIR = 'server/static/img/profilephotos'
+
+from server.models import *
+
 # Although it is called 'username, the authorization key is not
 # actually the user's username. The authorization header that
 # is sent to the Flask server is just called 'username', but
@@ -22,6 +34,21 @@ The user passes the secret key, this becomes the diary's name.
 '''
 AUTH_KEY = 'username'
 
+def get_current_profile():
+    if 'id' in session:
+        return Profile.query.get(session['id'])
+    else:
+        return False
+
+@app.before_first_request
+def app_init():
+    imgdir = Path(UPLOADS_DIR)
+    if not imgdir.exists():
+        imgdir.mkdir(parents=True)
+    try:
+        profile.query.all()
+    except:
+        db.create_all()
 
 def generate_key(diaryname, username):
     auth_s = URLSafeSerializer(os.environ['SECRET_KEY'], 'auth')
@@ -169,9 +196,11 @@ def list_entries():
 
     return jsonify({'result': entries})
 
+    ###########################
+    ###     Website routes  ###
+    ###########################
 
-@app.route('/diaries', methods=['GET'])
-def web_diaries():
+def get_web_diaries():
     config = Config(SERVER_CONFIG_ROOT)
     combo_diaries = config.get_diaries()
     diary_objs = combo_diaries[0]
@@ -183,13 +212,8 @@ def web_diaries():
     ids = [i for i in range(length)]
 
     session['keys'] = dict(zip(ids, d_key_lst))
-    return render_template(
-        "diaries.html",
-        d_names=d_names,
-        d_ids=ids,
-        _len=length
-    )
-
+    return d_names, ids, length
+    
 
 @app.route('/diaries/<string:diary_id>/', methods=['GET'])
 def web_entries(diary_id):
@@ -200,10 +224,112 @@ def web_entries(diary_id):
     name = get_diaryname_from_key(diary_key)
     return render_template("entries.html", entries=entries, name=name)
 
+@app.route('/main/', methods=['GET'])
+def main():
+    # Query from database
+    profile = get_current_profile()
+    if profile:
+        username = Profile.query.get(session['id']).username
+    else:
+        username=""
+    d_names, d_ids, _len = get_web_diaries()
+    return render_template('main.html', username=username, d_names=d_names, d_ids = d_ids, _len=_len)
+
+@app.route('/login/', methods=['GET'])
+def login_form():
+    return render_template('login.html')
+
+@app.route('/login/', methods=['POST'])
+def post_form():
+    #make sure that thing below is adding to session properly
+    inuser = request.form['username']
+    inpw = request.form['pw']
+    message = ""
+    usermatch = Profile.query.filter_by(username=inuser, password=inpw).first()
+    try:
+        if usermatch.username == inuser and usermatch.password == inpw:
+            session['id'] = usermatch.id
+
+            return redirect(url_for('main'))
+        else:
+        
+            message = "Invalid username/password combination."
+            return render_template('login.html', message=message)
+    except:
+        message = "Invalid username/password combination."
+    return render_template('login.html', message=message)
+
+
+
+@app.route('/profile/create/', methods=['GET'])
+def create_profile():
+    return render_template('createprofile.html')
+
+@app.route('/profile/create/', methods=['POST'])
+def post_profile():
+    #create profile from given items
+    showerror = False
+    message = ""
+    inuser = request.form['username']
+    usermatch = Profile.query.filter_by(username=inuser).first()
+    try:
+        if usermatch.username == inuser:
+            showerror = True
+            message = "Could not create profile: that username is already taken."
+    except:
+        message = ""
+
+    inemail = request.form['email']
+    inpw = request.form['pw']
+    infile = request.files['propic']
+    filename = secure_filename(infile.filename)
+    filename = inuser + filename
+    filepath = os.path.join(UPLOADS_DIR, filename)
+    
+    if inuser == "":
+        showerror = True
+        message = "Username cannot be blank."
+    elif inemail == "":
+        showerror = True
+        message = "Email cannot be blank."
+    elif inpw == "":
+        showerror = True
+        message = "Password cannot be blank."
+    
+    if showerror:
+        return render_template('createprofile.html', message=message)
+
+    if infile:
+        infile.save(filepath)
+        prof_id = db.session.query(func.count(Profile.id).label('count'))
+        prof_id = str(prof_id.first())
+        prof_id = int(prof_id[1:-2])
+        prof_id += 1
+        p = Profile(id=prof_id, username=inuser, password=inpw, email=inemail, photofn = filename)
+        db.session.add(p)
+        db.session.commit() 
+
+        return redirect(url_for('login_form'))
+    else:
+        message = "Invalid file type."
+        return render_template('createprofile.html', message=message)
+
+@app.route('/profile/', methods=['GET'])
+def my_profile():
+    profile = get_current_profile()
+    return render_template('profile.html', profile=profile, username=profile.username)
+
+@app.route('/profile/<int:profile_id>/', methods=['GET'])
+def show_profile(profile_id):
+    other_profile = Profile.query.get(profile_id)
+    if other_profile:
+        return render_template('profile.html', profile=other_profile)
+    else:
+        abort(404)
 
 @app.route('/')
 def index():
-    return 'Server running... brief documentation should go here'
+    return redirect(url_for("main"))
 
 
 if __name__ == '__main__':

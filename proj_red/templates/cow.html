@@ -67,7 +67,7 @@
                 <form class="html-form-text" action="{{ url_for('process_text') }}" method="POST">
                 <div class="form-group">
                     <label class="form-style" for="input_text">Enter Text for the cow to say</label>
-                    <input type="text" class="form-control" id="input_text" aria-describeby="textInput" id="input_text" placeholder="Text here..." name="input_text">
+                    <textarea class="form-control" id="input_text" placeholder="Text here..." name="input_text"></textarea>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>

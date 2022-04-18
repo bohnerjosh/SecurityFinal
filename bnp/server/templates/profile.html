@@ -1,0 +1,81 @@
+{% extends "site.html" %}
+{% block title %}{{ profile.username }}'s Profile{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
+
+<img src="{{ url_for('static', filename='img/profilephotos/' + profile.photofn)}}">
+
+<h1 class="dark">{{ profile.username }}</h1>
+
+<span id="profile-id">{{ profile.id }}</span>
+
+{% if messages %}
+<ul id="messages" class="alert alert-danger" role="alert">
+  {% for message in messages %}
+    <li>{{ message }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+<!-- FIXME: get all diaries that the user has created to choose from -->
+<!-- FIXME: Make buttons for public or private diary -->
+<!-- FIXME: Add an ajax request to get diary names for the server if they exist -->
+<form id="post-form">
+    <div class="form-group">
+        <label for="dtype">Diary type</label>
+        <select class="form-control" id="dtype" name="dtype">
+            <option value="private">Private</option>
+            <option value="public">Public</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="dname">Diary Name</label>
+        
+        {% if dnames %}
+            <select class="form-control" id="dtype" name="dname">
+                {% for dname in dnames %}
+                    <option value={{ dname }}>{{ dname }}</option>
+                {% endfor %}
+            </select>
+        {% else %}
+            <input type="text" class="form-control" name="dname" placeholder="Enter a new diary name...">
+        {% endif %}
+    </div>
+  <div class="mb-3">
+    <textarea class="form-control" id="post-content" name="content"></textarea>
+  </div>
+  <button id="btn-post" type="submit" class="btn btn-dark mb-3">Post</button>
+</form>
+
+<!-- Modal
+<div class="modal fade" id="postModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Meowers</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+-->
+<div id="posts">
+
+</div>
+
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/posts.js') }}"></script>
+{% endblock %}
+

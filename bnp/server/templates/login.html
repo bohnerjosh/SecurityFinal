@@ -1,0 +1,32 @@
+{% extends "site.html" %}
+
+    {% block title %}User Login{% endblock %}
+    {% block head %}
+        {{ super() }}
+    {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center">
+    <form action="{{ url_for('post_form') }}" method="POST">
+  <div class="form-group">
+    <label for="username">Username</label>
+    <input type="name" class="form-control" id="username" name="username">
+  </div>
+  <div class="form-group">
+    <label for="pw">Password</label>
+    <input type="password" class="form-control" id="pw" name="pw">
+  </div>
+  <button type="dark" class="btn btn-primary">Login</button>
+
+  {% if message %}
+  <div class="alert alert-danger" role="alert">
+    {{ message }}
+  </div>
+  {% endif %}
+</form>
+
+    </div>
+    </div>
+    <p class="row dark justify-content-center my-2">No profile? Make one <a class="mx-1"href="{{ url_for('create_profile') }}">here</a> </p>
+{% endblock %}

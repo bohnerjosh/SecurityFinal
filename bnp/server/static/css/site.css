@@ -1,0 +1,29 @@
+#main-content {
+    padding-top: 70px;
+    color: gray;
+}
+
+.diaries-header {
+    padding-left: 10px;
+    color: black;
+}
+
+.navbar {
+    background-color: lightgray;
+}
+
+.login-btn {
+    outline-offset: 50px;
+}
+
+body {
+    background-color: #188750;
+}
+
+label {
+    color: black;
+}
+
+.dark {
+    color: black;
+}

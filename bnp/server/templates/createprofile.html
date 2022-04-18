@@ -1,0 +1,42 @@
+{% extends "site.html" %}
+
+
+    {% block title %}Create Profile{% endblock %}
+    {% block head %}
+        {{ super() }}
+    {% endblock %}
+ 
+{% block content %}
+    
+    <div class="container">
+        <div class="row justify-content-center">
+    <form method="POST" action="{{ url_for('post_profile') }}" enctype="multipart/form-data">
+  <div class="form-group">
+    <label for="username">Username</label>
+    <input type="name" class="form-control" id="username" name="username">
+  </div>
+  <div class="form-group">
+    <label for="email">Email</label>
+    <input type="email" class="form-control" id="email" name="email">
+  </div>
+  <div class="form-group">
+    <label for="pw">Password</label>
+    <input type="password" class="form-control" id="pw" name="pw">
+  </div>
+  <div class="form-group">
+    <label for="propic">Upload profile picture</label>
+    <input type="file" class="form-control-file dark" id="propic" name="propic">
+  </div>  
+    <button type="submit" class="btn btn-dark">Create Profile</button>
+  {% if message %}
+  <div class="alert alert-danger" role="alert">
+    {{ message }}
+  </div>
+  {% endif %}
+    </div>
+    </div>
+
+</form>
+
+{% endblock %}
+
