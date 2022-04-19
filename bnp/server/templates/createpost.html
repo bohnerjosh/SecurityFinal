@@ -1,0 +1,44 @@
+{% extends "site.html" %}
+{% block title %}Create Post{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
+
+<div class="container">
+<div class="row justify-content-center">
+<div class="col-xl-4 content-bg border rounded">
+<form class=diary-create id="post-form">
+    <div class="row">
+    <div class="across form-group col-xs-6">
+        <label for="dtype">Diary type</label>
+        <select class="form-control dropdown select-black" id="dtype" name="dtype">
+            <option value="private">Private</option>
+            <option value="public">Public</option>
+        </select>
+    </div>
+    <div class="across form-group col-xs-6">
+        <label for="dname">Diary Name</label>
+        
+        {% if dnames %}
+            <select class="form-control dropdown select-black" id="dtype" name="dname">
+                {% for dname in dnames %}
+                    <option value={{ dname }}>{{ dname }}</option>
+                {% endfor %}
+            </select>
+        {% else %}
+            <input type="text" class="form-control bg-dark" name="dname" placeholder="Enter a new diary name...">
+        {% endif %}
+    </div>
+    </div>
+
+  <div class="mb-3">
+    <textarea class="form-control bg-dark" id="post-content" name="content" placeholder="Dear Diary..."></textarea>
+  </div>
+  <button id="btn-post" type="submit" class="btn btn-dark mb-3">Post</button>
+</form>
+</div>
+</div>
+</div>
+</div>
+{% endblock %}
