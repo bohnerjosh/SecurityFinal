@@ -332,6 +332,12 @@ def create_post():
     profile = get_current_profile()
     return render_template("createpost.html", profile=profile) 
 
+@app.route('/logout/', methods=['GET'])
+def logout():
+    # remove username from session to logout and then just go to login page
+    del session['id']
+    return redirect(url_for('main'))
+
 @app.route('/')
 def index():
     return redirect(url_for("main"))
