@@ -237,6 +237,11 @@ def main():
 
 @app.route('/login/', methods=['GET'])
 def login_form():
+    profile = get_current_profile()
+    if profile:
+        profile = Profile.query.get(session['id'])
+    else:
+        profile=0
     return render_template('login.html')
 
 @app.route('/login/', methods=['POST'])
