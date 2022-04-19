@@ -229,11 +229,11 @@ def main():
     # Query from database
     profile = get_current_profile()
     if profile:
-        username = Profile.query.get(session['id']).username
+        profile = Profile.query.get(session['id'])
     else:
-        username=""
+        profile=0
     d_names, d_ids, _len = get_web_diaries()
-    return render_template('main.html', username=username, d_names=d_names, d_ids = d_ids, _len=_len)
+    return render_template('main.html', profile=profile, d_names=d_names, d_ids = d_ids, _len=_len)
 
 @app.route('/login/', methods=['GET'])
 def login_form():
@@ -326,6 +326,11 @@ def show_profile(profile_id):
         return render_template('profile.html', profile=other_profile)
     else:
         abort(404)
+
+@app.route('/post/create', methods=['GET'])
+def create_post():
+    profile = get_current_profile()
+    return render_template("createpost.html", profile=profile) 
 
 @app.route('/')
 def index():

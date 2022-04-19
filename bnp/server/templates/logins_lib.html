@@ -1,8 +1,8 @@
-{% macro login_ui(username) %}
-{% if username %}
+{% macro login_ui(profile) %}
+{% if profile.username %}
 
     <form class="form-inline my-2 my-lg-0" action="{{ url_for('my_profile') }}">
-    <span class="mx-3">Hello, {{ username }}</span>
+    <span class="mx-3">Hello, {{ profile.username }}</span>
     <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">My Profile</button>
     </form>
 

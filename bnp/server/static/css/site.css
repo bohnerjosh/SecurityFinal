@@ -1,5 +1,5 @@
 #main-content {
-    padding-top: 70px;
+    padding-top: 58px;
     color: gray;
 }
 
@@ -26,4 +26,58 @@ label {
 
 .dark {
     color: black;
+}
+
+.dropdown {
+    width: 90px;
+}
+
+.across {
+    padding: 5px;
+}
+
+.bg-dark {
+    color: white;
+    background: black;
+}
+
+.form-control::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+            color: white;
+            opacity: 1; /* Firefox */
+}
+
+.select-black {
+    color: white;
+    background: black;
+}
+
+.content-bg {
+    background-color: #15613b;
+}
+
+.profile-header {
+    background-color: #15613b;
+}
+
+.propic {
+    max-height: 98%;
+    max-width: 98%;
+}
+
+.username-style {
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.posts-div {
+    margin-top: 10px;
+}
+
+#log-ref {
+    max-width: 100%;
+}
+
+.my-diaries {
+    font-weight: bold;
 }

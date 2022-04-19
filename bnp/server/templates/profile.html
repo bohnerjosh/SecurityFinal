@@ -5,11 +5,12 @@
 {% endblock %}
 {% block content %}
 
-<img src="{{ url_for('static', filename='img/profilephotos/' + profile.photofn)}}">
+<div class="container">
+<div class="row justify-content-center align-items-center">
+<div class="col-xl-8 profile-header justify-content-center align-items-center">
+<img class="propic rounded border border-dark mx-auto d-block" src="{{ url_for('static', filename='img/profilephotos/' + profile.photofn)}}">
 
-<h1 class="dark">{{ profile.username }}</h1>
-
-<span id="profile-id">{{ profile.id }}</span>
+<h1 class="dark display-3 username-style text-center">{{ profile.username }}</h1>
 
 {% if messages %}
 <ul id="messages" class="alert alert-danger" role="alert">
@@ -22,55 +23,25 @@
 <!-- FIXME: get all diaries that the user has created to choose from -->
 <!-- FIXME: Make buttons for public or private diary -->
 <!-- FIXME: Add an ajax request to get diary names for the server if they exist -->
-<form id="post-form">
-    <div class="form-group">
-        <label for="dtype">Diary type</label>
-        <select class="form-control" id="dtype" name="dtype">
-            <option value="private">Private</option>
-            <option value="public">Public</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="dname">Diary Name</label>
-        
-        {% if dnames %}
-            <select class="form-control" id="dtype" name="dname">
-                {% for dname in dnames %}
-                    <option value={{ dname }}>{{ dname }}</option>
-                {% endfor %}
-            </select>
-        {% else %}
-            <input type="text" class="form-control" name="dname" placeholder="Enter a new diary name...">
-        {% endif %}
-    </div>
-  <div class="mb-3">
-    <textarea class="form-control" id="post-content" name="content"></textarea>
-  </div>
-  <button id="btn-post" type="submit" class="btn btn-dark mb-3">Post</button>
-</form>
 
-<!-- Modal
-<div class="modal fade" id="postModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Meowers</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-      
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
 </div>
--->
+
+<!-- FIXME: Add an IF statement here so when other people visit they can't create posts --!>
+<div class="col-xl-6 rounded posts-div content-bg justify-content-center align-items-center">
+<form class="form-inline my-2" action="{{ url_for('create_post') }}">
+<button id="log-ref" class="btn btn-dark mx-auto" type=submit>Log a Diary - What's on your mind?</button>
+</form>
+</div>
+</div>
+<div class="row justify-content-center align-items-center">
+<div class="col-xl-6 posts-div rounded content-bg justify-content-center align-items-center">
+<h2 class="dark my-diaries text-center"><u>My Diaries</u></h2>
 <div id="posts">
 
+</div>
+
+</div>
+</div>
 </div>
 
 {% endblock %}
@@ -78,4 +49,3 @@
 {{ super() }}
 <script src="{{ url_for('static', filename='js/posts.js') }}"></script>
 {% endblock %}
-
