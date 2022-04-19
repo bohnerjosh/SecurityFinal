@@ -327,6 +327,12 @@ def show_profile(profile_id):
     else:
         abort(404)
 
+@app.route('/logout/', methods=['GET'])
+def logout():
+    # remove username from session to logout and then just go to login page
+    del session['id']
+    return redirect(url_for('main'))
+
 @app.route('/')
 def index():
     return redirect(url_for("main"))

@@ -6,6 +6,9 @@
     <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">My Profile</button>
     </form>
 
+    <form class="form-inline my-2 my-lg-0" action="{{ url_for('logout') }}">
+    <button class="btn btn-outline-danger my-2 my-sm-0 mx-2" type="submit">Logout</button>
+    </form>
 {% else %}
 
     <form class="form-inline my-2 my-lg-0" action="{{ url_for('login_form') }}">
