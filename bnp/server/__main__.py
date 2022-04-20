@@ -8,6 +8,8 @@ from flask_sqlalchemy import SQLAlchemy
 from pathlib import Path
 from sqlalchemy.sql import func, and_
 from werkzeug.utils import secure_filename 
+import requests
+from requests.auth import HTTPBasicAuth
 
 app = Flask(__name__)
 app.secret_key = b'kjlaqetgffrvdup980j3'
@@ -191,14 +193,44 @@ def list_entries():
         'id': ent.id,
         'text': ent.text,
         'username': ent.username,
+
         'date': ent.date.strftime('%m-%d-%Y %H:%M'),
     }, entries))
 
     return jsonify({'result': entries})
 
     ###########################
-    ###     Website routes  ###
+    ###     Website funcs   ###
     ###########################
+
+def verify_diary_creation(diary_name, profile):
+    if diary_name == 'default' or diaryname == 'config':
+        display_message = True
+        message = f"Cannot make a diaryname called {diary_name}"
+    
+    diary_key = generate_key(diary_name, profile)
+
+    # verify the diary doesn't already exist
+    config = Config(SERVER_CONFIG_ROOT)
+    diarypath = config.basepath() / diary_key
+    if diarypath.exists():
+        display_message = True
+        message = "That diary already exists. Pick a different name."
+
+    # if errors, return back to post create screen
+    if display_message:
+        profile = get_current_profile().username
+        return 'error', message
+
+    # otherwise add diary to session
+    session['keys'][diary_name] = diary_key
+    return 'ok', diarykey
+
+def website_log_entry(diarykey, text, username):
+    config = Config(SERVER_CONFIG_ROOT)
+    diary = DiaryFactory.get_diary(diarykey, config)
+    date = datetime.now()
+    diary.add_entry(text, date, username)
 
 def init_diary_keys_session(username):
     config = Config(SERVER_CONFIG_ROOT)
@@ -209,6 +241,10 @@ def init_diary_keys_session(username):
     d_key_lst = [k.name for k in diary_objs]
     
     session['keys'] = dict(zip(d_names, d_key_lst))
+
+    ###########################
+    ###     Website routes  ###
+    ###########################
 
 @app.route('/api/get_public_diaries/', methods=['GET'])
 def get_public_diaries():
@@ -255,11 +291,11 @@ def main():
     # Query from database
     profile = get_current_profile()
     if profile:
-        profile = Profile.query.get(session['id'])
         init_diary_keys_session(profile.username)
     else:
         profile=0
     return render_template('main.html', profile=profile)
+    
 
 @app.route('/login/', methods=['GET'])
 def login_form():
@@ -363,6 +399,32 @@ def show_profile(profile_id):
 def create_post():
     profile = get_current_profile()
     return render_template("createpost.html", profile=profile) 
+
+@app.route('/post/create', methods=['POST'])
+def post_create_diary():
+    message = ""
+    display_message = False
+    diary_key = ""
+
+    profile = get_current_profile().username
+    diary_type = request.form['dtype']
+    diary_name = request.form['dname']
+    diary_text = request.form['content']
+
+    if diary_type == public:
+        if diary_name in session['keys']:
+            diary_key = session['keys'][diary_name]
+        else:
+            status, message = verify_diary_creation(diary_name, profile)
+            if status == 'error':
+                return render_template("createpost.html", profile=profile, message=message)
+
+            diary_key = message
+        
+        
+        website_log_entry(diarykey, text, username)
+        return redirect(url_for('my_profile'))
+
 
 @app.route('/logout/', methods=['GET'])
 def logout():
