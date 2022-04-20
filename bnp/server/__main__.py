@@ -397,13 +397,14 @@ def show_profile(profile_id):
     else:
         abort(404)
 
-@app.route('/post/create', methods=['GET'])
-def create_post():
+@app.route('/diary/log', methods=['GET'])
+def log_diary():
     profile = get_current_profile()
-    return render_template("createpost.html", profile=profile) 
+    diary_names = session['keys'].keys()
+    return render_template("createpost.html", profile=profile, dnames=diary_names) 
 
-@app.route('/post/create', methods=['POST'])
-def post_create_diary():
+@app.route('/diary/log', methods=['POST'])
+def post_log_diary():
     diary_key = ""
 
     profile = get_current_profile().username
