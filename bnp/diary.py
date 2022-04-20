@@ -227,11 +227,19 @@ class LocalDiary(AbstractDiary):
         if not success:
             raise DiaryException(f'No such entry {entry_id}')
 
-    def get_entries(self):
+    def get_entries(self, username=None):
         E = []
+        filter_username = False
+
+        if username is not None:
+            filter_username = True
 
         for p in sorted_iterdir(self.path):
             text = p.open().read()
+            if filter_username:
+                ent_username = p.name[p.name.find('-')+1:p.name.find('$')]
+                if ent_username != username:
+                    continue
             ent_id = int(p.name[:p.name.find('-')])
             username = p.name[p.name.find('-')+1:p.name.find('$')]
             timestr = p.name[p.name.find('$')+1:p.name.find('.txt')]
@@ -244,6 +252,14 @@ class LocalDiary(AbstractDiary):
 
         return E
 
+    def written_by_usr(self, username):
+        for p in sorted_iterdir(self.path):
+            text = p.open().read()
+            ent_username = p.name[p.name.find('-')+1:p.name.find('$')]
+            if ent_username == username:
+                return True
+
+        return False
 
 class Entry(object):
     def __init__(self, ent_id, text, date, username=None):

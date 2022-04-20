@@ -200,20 +200,46 @@ def list_entries():
     ###     Website routes  ###
     ###########################
 
-def get_web_diaries():
+def init_diary_keys_session(username):
     config = Config(SERVER_CONFIG_ROOT)
     combo_diaries = config.get_diaries()
     diary_objs = combo_diaries[0]
-
+    diary_objs = [d for d in diary_objs if d.written_by_usr(username)]
     d_names = [get_diaryname_from_key(d.name) for d in diary_objs]
     d_key_lst = [k.name for k in diary_objs]
-
-    length = len(d_names)
-    ids = [i for i in range(length)]
-
-    session['keys'] = dict(zip(ids, d_key_lst))
-    return d_names, ids, length
     
+    session['keys'] = dict(zip(d_names, d_key_lst))
+
+@app.route('/api/get_public_diaries/', methods=['GET'])
+def get_public_diaries():
+    # get the username if passed one. 
+    # This is for visiting other people's profiles
+    
+    username = get_current_profile().username
+    if 'profile_name' in request.args:
+        username = request.args.get('profile_name')
+    config = Config(SERVER_CONFIG_ROOT)
+    diaries = session['keys'].keys()
+    posts = {}
+    for diary in diaries:
+        diaryname = session[diary]
+        diary_obj = DiaryFactory.get_diary(diaryname)
+        entries = diary_obj.geti_entries(username)
+        posts[diary] = entries
+    return jsonify(posts)
+
+
+@app.route('/api/get_private_diaries/', methods=['GET'])
+def get_private_diaries():
+    # gets posts
+    profile_id = get_current_profile().id
+    if 'profile_name' in request.args:
+        u_name = request.args.get('profile_name')
+        profile_id = Profile.query.filter_by(username=u_name).id()
+    
+    entries = PrivateDiary.query.filter_by(profile_id=profile_id).all()
+    entries = list(map(lambda private_diary: private_diary.serialize(), entries))
+    return jsonify(entries)
 
 @app.route('/diaries/<string:diary_id>/', methods=['GET'])
 def web_entries(diary_id):
@@ -230,10 +256,10 @@ def main():
     profile = get_current_profile()
     if profile:
         profile = Profile.query.get(session['id'])
+        init_diary_keys_session(profile.username)
     else:
         profile=0
-    d_names, d_ids, _len = get_web_diaries()
-    return render_template('main.html', profile=profile, d_names=d_names, d_ids = d_ids, _len=_len)
+    return render_template('main.html', profile=profile)
 
 @app.route('/login/', methods=['GET'])
 def login_form():
@@ -242,7 +268,7 @@ def login_form():
         profile = Profile.query.get(session['id'])
     else:
         profile=0
-    return render_template('login.html')
+    return render_template('login.html', profile=profile)
 
 @app.route('/login/', methods=['POST'])
 def post_form():
@@ -254,7 +280,8 @@ def post_form():
     try:
         if usermatch.username == inuser and usermatch.password == inpw:
             session['id'] = usermatch.id
-
+            session['keys'] = {}
+            init_diary_keys_session(usermatch.username)
             return redirect(url_for('main'))
         else:
         
@@ -341,6 +368,7 @@ def create_post():
 def logout():
     # remove username from session to logout and then just go to login page
     del session['id']
+    del session['keys']
     return redirect(url_for('main'))
 
 @app.route('/')

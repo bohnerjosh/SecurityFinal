@@ -9,10 +9,5 @@
 
 <h3 class="diaries-header">Diaries</h3>
 
-<ul>
-{% for i in range(_len): %}
-    <li><a href="{{ url_for('web_entries', diary_id=d_ids[i] ) }}">{{ d_names[i] }}</a></li>
 
-{% endfor %}
-</ul>
 {% endblock %}
