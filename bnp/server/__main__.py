@@ -204,7 +204,9 @@ def list_entries():
     ###########################
 
 def verify_diary_creation(diary_name, profile):
-    if diary_name == 'default' or diaryname == 'config':
+    message = ""
+    display_message = False
+    if diary_name == 'default' or diary_name == 'config':
         display_message = True
         message = f"Cannot make a diaryname called {diary_name}"
     
@@ -212,7 +214,7 @@ def verify_diary_creation(diary_name, profile):
 
     # verify the diary doesn't already exist
     config = Config(SERVER_CONFIG_ROOT)
-    diarypath = config.basepath() / diary_key
+    diarypath = config.basepath / diary_key
     if diarypath.exists():
         display_message = True
         message = "That diary already exists. Pick a different name."
@@ -224,7 +226,7 @@ def verify_diary_creation(diary_name, profile):
 
     # otherwise add diary to session
     session['keys'][diary_name] = diary_key
-    return 'ok', diarykey
+    return 'ok', diary_key
 
 def website_log_entry(diarykey, text, username):
     config = Config(SERVER_CONFIG_ROOT)
@@ -402,8 +404,6 @@ def create_post():
 
 @app.route('/post/create', methods=['POST'])
 def post_create_diary():
-    message = ""
-    display_message = False
     diary_key = ""
 
     profile = get_current_profile().username
@@ -411,7 +411,7 @@ def post_create_diary():
     diary_name = request.form['dname']
     diary_text = request.form['content']
 
-    if diary_type == public:
+    if diary_type == "public":
         if diary_name in session['keys']:
             diary_key = session['keys'][diary_name]
         else:
@@ -422,7 +422,7 @@ def post_create_diary():
             diary_key = message
         
         
-        website_log_entry(diarykey, text, username)
+        website_log_entry(diary_key, diary_text, profile)
         return redirect(url_for('my_profile'))
 
 

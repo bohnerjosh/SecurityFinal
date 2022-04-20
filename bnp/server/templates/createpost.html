@@ -8,7 +8,7 @@
 <div class="container">
 <div class="row justify-content-center">
 <div class="col-xl-4 content-bg border rounded">
-<form class=diary-create id="post-form" action="{{ url_for('post_create_diary') }}">
+<form class=diary-create id="post-form" action="{{ url_for('post_create_diary') }}" method="POST">
     <div class="row">
     <div class="across form-group col-xs-6">
         <label for="dtype">Diary type</label>
