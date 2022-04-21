@@ -426,6 +426,11 @@ def post_log_diary():
         website_log_entry(diary_key, diary_text, profile)
         return redirect(url_for('my_profile'))
 
+@app.route('/profile/key_management', methods=['GET'])
+def get_key_management():
+    profile = get_current_profile()
+    diary_names = session['keys'].keys()
+    return render_template("key_management.html", profile=profile, dnames=diary_names)
 
 @app.route('/logout/', methods=['GET'])
 def logout():

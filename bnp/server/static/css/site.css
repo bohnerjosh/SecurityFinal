@@ -81,3 +81,11 @@ label {
 .my-diaries {
     font-weight: bold;
 }
+
+.option-l {
+    margin-left: 10px;
+}
+
+.option-r {
+    margin-right: 16px;
+}
