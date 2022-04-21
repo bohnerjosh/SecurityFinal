@@ -27,8 +27,8 @@
 </div>
 </div>
 <div class="row justify-content-center">
-<div class="col-xs-6">
-<div class="row rounded posts-div content-bg">
+<div class="col-xs-6 rounded options-div content-bg">
+<div class="row">
 <!-- FIXME: Add an IF statement here so when other people visit they can't create posts --!>
 <div class="option-l col-xs-12 across justify-content-center">
 <form class="form-inline mx-2 my-2" action="{{ url_for('log_diary') }}">
@@ -41,15 +41,29 @@
 </form>
 </div>
 </div>
+<div class="column">
+    <div class="row">
+        <h2 class="dark my-diaries"><u class="text-center">My Diaries</u></h2>
+    </div>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="row justify-content-center align-items-center">
 <div class="col-xl-6 posts-div rounded content-bg justify-content-center align-items-center">
-<h2 class="dark my-diaries text-center"><u>My Diaries</u></h2>
+</div>
+</div>
 
-
-<div id="posts">
-
+<div class="row justify-content-center align-items-center">
+<div id="posts" class=col-xs-9>
+    <div class="entry rounded" entryid="1">
+        <div class="entry-head"></div>
+        <div class="entry-author">Submitted by <a href="#">{{ profile.username }}</a> @ 04-20-2022 21:32 (#2)</div>
+        <div class="entry-body">EGG EGG EGG</div>
+    </div>
+            
+    
 </div>
 
 </div>
