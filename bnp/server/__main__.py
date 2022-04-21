@@ -248,8 +248,8 @@ def init_diary_keys_session(username):
     ###     Website routes  ###
     ###########################
 
-@app.route('/api/get_public_diaries/', methods=['GET'])
-def get_public_diaries():
+@app.route('/api/get_public_profile_diaries/', methods=['GET'])
+def get_public_profile_diaries():
     # get the username if passed one. 
     # This is for visiting other people's profiles
     
@@ -268,7 +268,7 @@ def get_public_diaries():
 
 
 @app.route('/api/get_private_diaries/', methods=['GET'])
-def get_private_diaries():
+def get_private_profile_diaries():
     # gets posts
     profile_id = get_current_profile().id
     if 'profile_name' in request.args:

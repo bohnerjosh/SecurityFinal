@@ -70,7 +70,7 @@ label {
     margin-bottom: 20px;
 }
 
-.posts-div {
+.options-div {
     margin-top: 10px;
 }
 
@@ -88,4 +88,21 @@ label {
 
 .option-r {
     margin-right: 16px;
+}
+
+.entry {
+    background-color: #15613b;
+    margin: 10px;
+}
+
+.entry-head {
+
+}
+
+.entry-author {
+    
+}
+
+.entry-body {
+
 }
