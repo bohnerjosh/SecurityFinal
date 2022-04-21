@@ -1,14 +1,15 @@
-{% macro login_ui(profile) %}
-{% if profile %}
+{% macro login_ui(login_profile) %}
+{% if login_profile %}
 
     <form class="form-inline my-2 my-lg-0" action="{{ url_for('my_profile') }}">
-    <span class="mx-3">Hello, {{ profile.username }}</span>
+    <span class="mx-3">Hello, {{ login_profile.username }}</span>
     <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">My Profile</button>
     </form>
 
     <form class="form-inline my-2 my-lg-0" action="{{ url_for('logout') }}">
     <button class="btn btn-outline-danger my-2 my-sm-0 mx-2" type="submit">Logout</button>
     </form>
+    <span id="login-profile-id" hidden>{{ login_profile.id }}</span>
 {% else %}
 
     <form class="form-inline my-2 my-lg-0" action="{{ url_for('login_form') }}">
@@ -18,8 +19,7 @@
     <form class="form-inline my-2 my-lg-0" action="{{ url_for('create_profile') }}">
     <button class="register-btn btn btn-outline-dark my-2 my-sm-0" type="submit">Register</button>
     </form>
-
-
+    
 {% endif %}
 {% endmacro %}
 

@@ -248,6 +248,11 @@ def init_diary_keys_session(username):
     ###     Website routes  ###
     ###########################
 
+
+@app.route('/api/get_main_diary_entries/', methods=['GET'])
+def main_diary_entries():
+    config = Config(SERVER_CONFIG_ROOT)
+
 @app.route('/api/get_public_profile_diaries/', methods=['GET'])
 def get_public_profile_diaries():
     # get the username if passed one. 
@@ -258,13 +263,14 @@ def get_public_profile_diaries():
         username = request.args.get('profile_name')
     config = Config(SERVER_CONFIG_ROOT)
     diaries = session['keys'].keys()
-    posts = {}
+    entries_lst = []
     for diary in diaries:
-        diaryname = session[diary]
-        diary_obj = DiaryFactory.get_diary(diaryname)
-        entries = diary_obj.geti_entries(username)
-        posts[diary] = entries
-    return jsonify(posts)
+        diaryname = session['keys'][diary]
+        diary_obj = DiaryFactory.get_diary(diaryname, config)
+        entries = diary_obj.get_entries(username)
+        for entry in entries:
+            entries_lst.append(entry.serialize(diary))
+    return jsonify(entries_lst)
 
 
 @app.route('/api/get_private_diaries/', methods=['GET'])
@@ -296,7 +302,7 @@ def main():
         init_diary_keys_session(profile.username)
     else:
         profile=0
-    return render_template('main.html', profile=profile)
+    return render_template('main.html', login_profile=profile)
     
 
 @app.route('/login/', methods=['GET'])
@@ -306,7 +312,7 @@ def login_form():
         profile = Profile.query.get(session['id'])
     else:
         profile=0
-    return render_template('login.html', profile=profile)
+    return render_template('login.html', login_profile=profile)
 
 @app.route('/login/', methods=['POST'])
 def post_form():
@@ -387,13 +393,14 @@ def post_profile():
 @app.route('/profile/', methods=['GET'])
 def my_profile():
     profile = get_current_profile()
-    return render_template('profile.html', profile=profile, username=profile.username)
+    return render_template('profile.html', login_profile=profile, profile=profile)
 
 @app.route('/profile/<int:profile_id>/', methods=['GET'])
 def show_profile(profile_id):
+    login_user = get_current_profile()
     other_profile = Profile.query.get(profile_id)
     if other_profile:
-        return render_template('profile.html', profile=other_profile)
+        return render_template('profile.html', login_profile=login_user, profile=other_profile)
     else:
         abort(404)
 
@@ -401,24 +408,26 @@ def show_profile(profile_id):
 def log_diary():
     profile = get_current_profile()
     diary_names = session['keys'].keys()
-    return render_template("createpost.html", profile=profile, dnames=diary_names) 
+    return render_template("createpost.html", login_profile=profile, dnames=diary_names) 
 
 @app.route('/diary/log', methods=['POST'])
 def post_log_diary():
     diary_key = ""
 
-    profile = get_current_profile().username
+    profile = get_current_profile()
     diary_type = request.form['dtype']
     diary_name = request.form['dname']
     diary_text = request.form['content']
 
     if diary_type == "public":
+
+        profile = profile.username
         if diary_name in session['keys']:
             diary_key = session['keys'][diary_name]
         else:
             status, message = verify_diary_creation(diary_name, profile)
             if status == 'error':
-                return render_template("createpost.html", profile=profile, message=message)
+                return render_template("createpost.html", login_profile=profile, message=message)
 
             diary_key = message
         
@@ -426,11 +435,19 @@ def post_log_diary():
         website_log_entry(diary_key, diary_text, profile)
         return redirect(url_for('my_profile'))
 
+    date = datetime.now()
+    date = date.strftime('%m-%d-%Y %H:%M')
+    private_diary = PrivateDiary(content=diary_text, profile_id=profile.id, name=diary_name, date=date)
+
+    db.session.add(private_diary)
+    db.session.commit()
+    return redirect(url_for('my_profile'))
+
 @app.route('/profile/key_management', methods=['GET'])
 def get_key_management():
     profile = get_current_profile()
     diary_names = session['keys'].keys()
-    return render_template("key_management.html", profile=profile, dnames=diary_names)
+    return render_template("key_management.html", login_profile=profile, dnames=diary_names)
 
 @app.route('/logout/', methods=['GET'])
 def logout():

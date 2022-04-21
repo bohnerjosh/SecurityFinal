@@ -3,13 +3,21 @@
     color: gray;
 }
 
-.diaries-header {
-    padding-left: 10px;
+#profile-id {
+    display: none;
+}
+
+.subtitle-header {
     color: black;
+    font-weight: bold;
 }
 
 .navbar {
     background-color: lightgray;
+}
+
+.main-entries {
+    margin-top: 50px;
 }
 
 .login-btn {
@@ -62,6 +70,7 @@ label {
 .propic {
     max-height: 98%;
     max-width: 98%;
+    border-width: 10px;
 }
 
 .username-style {
@@ -91,18 +100,32 @@ label {
 }
 
 .entry {
-    background-color: #15613b;
+    background-color: #d3d3d3;
     margin: 10px;
+    color: black;
+    width: 450px;
 }
 
 .entry-head {
-
+    font-weight: bold;
+    font-size: 20px;
 }
 
 .entry-author {
-    
+    font-size: 12px;
 }
 
 .entry-body {
+    max-width: 100%;
+    overflow-wrap: break-word;
+}
 
+.line {
+    margin:-1px;
+}
+
+.warning {
+    color: red;
+    font-weight: bold;
+    overflow-wrap: break-word;
 }

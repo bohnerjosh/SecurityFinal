@@ -5,12 +5,14 @@
 {% endblock %}
 {% block content %}
 
+<span id="profile-id">{{ profile.id }}</span>
 <div class="container">
 <div class="row justify-content-center align-items-center">
 <div class="col-xl-8 profile-header justify-content-center align-items-center">
 <img class="propic rounded border border-dark mx-auto d-block" src="{{ url_for('static', filename='img/profilephotos/' + profile.photofn)}}">
 
 <h1 class="dark display-3 username-style text-center">{{ profile.username }}</h1>
+
 
 {% if messages %}
 <ul id="messages" class="alert alert-danger" role="alert">
@@ -41,31 +43,23 @@
 </form>
 </div>
 </div>
-<div class="column">
-    <div class="row">
-        <h2 class="dark my-diaries"><u class="text-center">My Diaries</u></h2>
-    </div>
-</div>
-</div>
-</div>
 </div>
 </div>
 <div class="row justify-content-center align-items-center">
-<div class="col-xl-6 posts-div rounded content-bg justify-content-center align-items-center">
-</div>
-</div>
+<div class="col-xl-5 options-div rounded content-bg justify-content-center align-items-center">
+        <h2 class="dark my-diaries text-center"><u>My Private Diaries</u></h2>
+        <div id="messages"></div>
 
 <div class="row justify-content-center align-items-center">
-<div id="posts" class=col-xs-9>
-    <div class="entry rounded" entryid="1">
-        <div class="entry-head"></div>
-        <div class="entry-author">Submitted by <a href="#">{{ profile.username }}</a> @ 04-20-2022 21:32 (#2)</div>
-        <div class="entry-body">EGG EGG EGG</div>
-    </div>
-            
+<div id="private-entries" class="col-l-8">
     
 </div>
 
+
+<div id="public-entries" class="col-l-8">
+        <h2 class="dark my-diaries text-center"><u>My Public Diaries</u></h2>
+
+</div>
 </div>
 </div>
 </div>
@@ -73,5 +67,5 @@
 {% endblock %}
 {% block scripts %}
 {{ super() }}
-<script src="{{ url_for('static', filename='js/posts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/profile-entries.js') }}"></script>
 {% endblock %}
