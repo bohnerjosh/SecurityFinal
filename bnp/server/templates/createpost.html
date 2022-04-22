@@ -12,7 +12,7 @@
     <div class="row">
     <div class="across form-group col-xs-6">
         <label for="dtype">Diary type</label>
-        <select class="form-control dropdown select-black" id="dtype" name="dtype">
+        <select class="form-control dropdown" id="dtype" name="dtype">
             <option value="private">Private</option>
             <option value="public">Public</option>
         </select>
@@ -21,19 +21,19 @@
         <label for="dname">Diary Name</label>
         
         {% if dnames %}
-            <select class="form-control dropdown select-black" id="dtype" name="dname">
+            <select class="form-control dropdown" id="dtype" name="dname">
                 {% for dname in dnames %}
                     <option value={{ dname }}>{{ dname }}</option>
                 {% endfor %}
             </select>
         {% else %}
-            <input type="text" class="form-control bg-dark" name="dname" placeholder="Enter a new diary name...">
+            <input type="text" class="form-control" name="dname" placeholder="Enter a new diary name...">
         {% endif %}
     </div>
     </div>
 
   <div class="mb-3">
-    <textarea class="form-control bg-dark" id="post-content" name="content" placeholder="Dear Diary..."></textarea>
+    <textarea class="form-control" id="post-content" name="content" placeholder="Dear Diary..."></textarea>
   </div>
   <button id="btn-post" type="submit" class="btn btn-dark mb-3">Post</button>
 </form>

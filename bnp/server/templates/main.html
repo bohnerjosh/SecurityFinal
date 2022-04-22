@@ -6,8 +6,35 @@
 {% endblock %}
 
 {% block content %}
+<span id="call-id" hidden>0</span>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-xl-5 rounded justify-content-center">
 
-<h3 class="diaries-header">Diaries</h3>
+        <img src="{{ url_for('static', filename='img/logo.png') }}" class="d-block mx-auto">
 
+        <h3 class="subtitle-header text-center">Hosted by Kay</h3>
 
+        </div>
+    </div>
+
+<div class="row main-entries justify-content-center align-items-center">
+    <div class="col-xl-5 rounded content-bg justify-content-center align-items-center">
+        <h2 class="dark my-diaries text-center"><u>Diaries</u></h2> 
+
+        <div class="row justify-content-center align-items-center">
+            <div id="entries" class="col-l-8">
+
+            </div>
+        </div>
+    </div>
+</div>
+        <div class="row justify-content-center align-items-center">
+            <a href="#" id="append-diary" class="dark">Older posts</a>
+        </div>
+
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/main-entries.js') }}"></script>
 {% endblock %}

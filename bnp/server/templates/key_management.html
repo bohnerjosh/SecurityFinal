@@ -1,0 +1,73 @@
+{% extends "site.html" %}
+
+{% block title %}Key Management{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-xl-5 options-div rounded justify-content-center">
+            <h2 class="dark text-center"><u>Your Diaries</u></h2>
+            {% for dname in dnames %}
+                <p class="text-center dark">{{ dname }}</p>
+            {% endfor %}
+
+    <div class="row justify-content-center">
+        <div class="col-l-8 content-bg management-col rounded">
+            <form action="{{ url_for('mgmnt_connect') }}" class="justify-content-center" method="POST">
+                <div class="form-group">
+                    <label for="key" class="">Connect to a friend's diary via Diarykey</label>
+                    <input type="text" class="form-control man-in" name="key" placeholder="Diarykey here...">
+                    <button class="btn btn-dark mx-auto" type=submit>Submit</button>
+                </div>
+            </form>
+
+        </div>
+
+        <div class="col-l-8 rounded content-bg management-col">
+            <form action="{{ url_for('new_public') }}" method="POST">
+                <div class="form-group ">
+                    <label for="dname" class="text-center">Create a new public diary</label>
+                    <input type="text" class="form-control man-in" name="dname" placeholder="Diary Name here...">
+                    <button class="btn btn-dark mx-auto" type=submit>Submit</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-l-8 rounded content-bg management-col">
+            <form action="{{ url_for('new_private') }}" method="POST">
+                <div class="form-group ">
+                    <label for="dname" class="text-center">Create a new private diary</label>
+                    <input type="text" class="form-control man-in" name="dname" placeholder="Diary Name here...">
+                    <button class="btn btn-dark mx-auto" type=submit>Submit</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-l-8 rounded content-bg management-col">
+            <form action="{{ url_for('get_diarykey') }}" method="POST">
+                <div class="form-group">
+                    <label for="diaryname" class="text-center">Get a diarykey to share</label>
+                    <input type="text" class="form-control man-in" name="diaryname" placeholder="Enter diary name">
+                    <button class="btn btn-dark mx-auto" type=submit>Submit</button>
+                </div>
+            </form>
+        </div>
+        <div id="diarykey-place" class="dark text-center">
+        {% if diary_key %}
+            Diary key: 
+            {{ diary_key }}
+        {% endif %}
+        {% if message %}
+            <div class="alert alert-danger" role="alert">
+                {{ message }}
+            </div>
+        {% endif %}
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

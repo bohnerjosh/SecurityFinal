@@ -1,5 +1,6 @@
 from bnp.config import Config
 from bnp.diary import DiaryException, DiaryFactory
+from bnp.heap import MinHeap
 from datetime import datetime
 from flask import Flask, abort, request, jsonify, render_template, url_for, session, redirect
 from itsdangerous import URLSafeSerializer
@@ -21,6 +22,7 @@ db = SQLAlchemy(app)
 
 SERVER_CONFIG_ROOT = './.bnp-server'
 UPLOADS_DIR = 'server/static/img/profilephotos'
+DEFAULT_MAIN_ENTRY_PRINT = 5
 
 from server.models import *
 
@@ -35,6 +37,7 @@ from server.models import *
 The user passes the secret key, this becomes the diary's name.
 '''
 AUTH_KEY = 'username'
+minHeap = MinHeap(1000)
 
 def get_current_profile():
     if 'id' in session:
@@ -113,6 +116,7 @@ def add_entry():
         The client must provide a project key via
         BasicAuth and 'text' via the POST form.
         Failure to do so will result in a 400 error.
+DEFAULT_MAIN_ENTRY_PRINT = 5
 
         If both are provided, the server will return
             { 'result': 'ok' }
@@ -224,25 +228,56 @@ def verify_diary_creation(diary_name, profile):
         profile = get_current_profile().username
         return 'error', message
 
-    # otherwise add diary to session
+    # otherwise create diary and add to session
+    DiaryFactory.get_diary(diary_key, config)
     session['keys'][diary_name] = diary_key
     return 'ok', diary_key
 
 def website_log_entry(diarykey, text, username):
     config = Config(SERVER_CONFIG_ROOT)
     diary = DiaryFactory.get_diary(diarykey, config)
+
     date = datetime.now()
     diary.add_entry(text, date, username)
 
-def init_diary_keys_session(username):
+def init_session(username):
     config = Config(SERVER_CONFIG_ROOT)
-    combo_diaries = config.get_diaries()
-    diary_objs = combo_diaries[0]
-    diary_objs = [d for d in diary_objs if d.written_by_usr(username)]
+    diary_objs = config.get_diaries()[0]
+    usr_diary_objs = [d for d in diary_objs if d.written_by_usr(username)]
     d_names = [get_diaryname_from_key(d.name) for d in diary_objs]
     d_key_lst = [k.name for k in diary_objs]
     
     session['keys'] = dict(zip(d_names, d_key_lst))
+   
+def get_private_dnames():
+    u_id = get_current_profile().id
+    diaries = PrivateDiary.query.filter_by(profile_id=u_id).all()
+    dnames = [d.name for d in diaries]
+    return dnames
+
+def get_client_diaries():
+    diary_names = list(session['keys'].keys())
+    private_diaries = get_private_dnames()
+    diary_names += private_diaries
+    return diary_names
+
+def get_main_diaries():
+    config = Config(SERVER_CONFIG_ROOT)
+    diaries = config.get_diaries()[0]
+    entry_list = []
+    for diary in diaries:
+        name = get_diaryname_from_key(diary.name)
+        entries = diary.get_entries()
+        for entry in entries:
+            entry.diaryname = name
+            user = Profile.query.filter_by(username=entry.username).first()
+            
+            entry.u_id = user.id
+            
+        entry_list += entries
+            
+    for entry in entry_list:
+        minHeap.insert(entry) 
 
     ###########################
     ###     Website routes  ###
@@ -251,8 +286,16 @@ def init_diary_keys_session(username):
 
 @app.route('/api/get_main_diary_entries/', methods=['GET'])
 def main_diary_entries():
-    config = Config(SERVER_CONFIG_ROOT)
-
+    done = False
+    size = minHeap.size
+    if size < DEFAULT_MAIN_ENTRY_PRINT:
+        size = minHeap.size
+        done=True
+    else:
+        size = DEFAULT_MAIN_ENTRY_PRINT
+    entry_lst = [minHeap.getMin().serialize() for i in range(size)]
+    return jsonify(entry_lst)
+    
 @app.route('/api/get_public_profile_diaries/', methods=['GET'])
 def get_public_profile_diaries():
     # get the username if passed one. 
@@ -269,7 +312,8 @@ def get_public_profile_diaries():
         diary_obj = DiaryFactory.get_diary(diaryname, config)
         entries = diary_obj.get_entries(username)
         for entry in entries:
-            entries_lst.append(entry.serialize(diary))
+            entry.diaryname = diary
+            entries_lst.append(entry.serialize())
     return jsonify(entries_lst)
 
 
@@ -297,10 +341,10 @@ def web_entries(diary_id):
 @app.route('/main/', methods=['GET'])
 def main():
     # Query from database
+    minHeap.clear()
+    get_main_diaries()
     profile = get_current_profile()
-    if profile:
-        init_diary_keys_session(profile.username)
-    else:
+    if not profile:
         profile=0
     return render_template('main.html', login_profile=profile)
     
@@ -325,7 +369,8 @@ def post_form():
         if usermatch.username == inuser and usermatch.password == inpw:
             session['id'] = usermatch.id
             session['keys'] = {}
-            init_diary_keys_session(usermatch.username)
+            session['viewed'] = {}
+            init_session(usermatch.username)
             return redirect(url_for('main'))
         else:
         
@@ -407,8 +452,12 @@ def show_profile(profile_id):
 @app.route('/diary/log', methods=['GET'])
 def log_diary():
     profile = get_current_profile()
-    diary_names = session['keys'].keys()
+    diary_names = get_client_diaries()
     return render_template("createpost.html", login_profile=profile, dnames=diary_names) 
+
+    diary_names = session['keys'].keys()
+    private_diaries = get_private_dnames()
+    diary_names += private_diaries
 
 @app.route('/diary/log', methods=['POST'])
 def post_log_diary():
@@ -435,6 +484,7 @@ def post_log_diary():
         website_log_entry(diary_key, diary_text, profile)
         return redirect(url_for('my_profile'))
 
+    
     date = datetime.now()
     date = date.strftime('%m-%d-%Y %H:%M')
     private_diary = PrivateDiary(content=diary_text, profile_id=profile.id, name=diary_name, date=date)
@@ -446,14 +496,71 @@ def post_log_diary():
 @app.route('/profile/key_management', methods=['GET'])
 def get_key_management():
     profile = get_current_profile()
-    diary_names = session['keys'].keys()
+    diary_names = get_client_diaries()
     return render_template("key_management.html", login_profile=profile, dnames=diary_names)
+
+@app.route('/key_management/new/private', methods=['POST'])
+def new_private():
+    message = ""
+    diary_name = request.form['dname']
+    profile = get_current_profile()
+    usermatch = PrivateDiary.query.filter_by(name=diary_name).first()
+    try:
+        if usermatch == diary_name:
+            message = "A diary with that name already exists"
+        elif diary_name == "":
+            message = "Diary name cannot be blank"
+
+        diary_names = get_client_diaries()
+        return render_template("key_management.html", login_profile=profile, dnames=diary_names, message=message)
+    except:
+        date = datetime.now()
+        date = date.strftime('%m-%d-%Y %H:%M')
+        private_diary = PrivateDiary(content=diary_text, profile_id=profile.id, name=diary_name, date=date)
+
+        db.session.add(private_diary)
+        db.session.commit()
+        return redirect(url_for('get_key_management'))
+
+@app.route('/key_management/connect', methods=['POST'])
+def mgmnt_connect():
+    pass
+
+@app.route('/key_management/new/public', methods=['POST'])
+def new_public():
+    message = ""
+    diary_name = request.form["dname"]
+    profile = get_current_profile()
+    status, message = verify_diary_creation(diary_name, profile.username)
+    
+    diary_names = get_client_diaries()
+    if status == 'error':
+        return render_template("key_management.html", login_profile=profile, dnames=diary_names, message=message)
+    else:
+        diary_key = message
+        print(session['keys'])
+        return render_template("key_management.html", login_profile=profile, dnames=diary_names, diary_key=diary_key)
+
+@app.route('/key_management/get_diarykey', methods=['POST'])
+def get_diarykey():
+    profile = get_current_profile()
+    message = ""
+    diary_names = session['keys'].keys()
+    diary_name = request.form["diaryname"]
+    if diary_name in session['keys']:
+        print(session['keys'])
+        diary_key = session['keys'][diary_name]
+        return render_template("key_management.html", login_profile=profile, dnames=diary_names, diary_key=diary_key)
+    else:
+        message = "invalid diary name or it is a private diary"
+        return render_template("key_management.html", login_profile=profile, dnames=diary_names, message=message)
 
 @app.route('/logout/', methods=['GET'])
 def logout():
     # remove username from session to logout and then just go to login page
     del session['id']
     del session['keys']
+    del session['viewed']
     return redirect(url_for('main'))
 
 @app.route('/')
