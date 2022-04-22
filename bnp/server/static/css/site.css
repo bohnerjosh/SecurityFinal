@@ -129,3 +129,12 @@ label {
     font-weight: bold;
     overflow-wrap: break-word;
 }
+
+.management-col {
+    margin: 10px;
+    width: 450px;
+}
+
+.man-in {
+    width: 400px;
+}

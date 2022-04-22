@@ -262,11 +262,23 @@ class LocalDiary(AbstractDiary):
         return False
 
 class Entry(object):
-    def __init__(self, ent_id, text, date, username=None):
+    def __init__(self, ent_id, text, date, username=None, u_id=None):
         self.id = ent_id
         self.text = text
         self.date = date
         self.username = username
+        self.u_id = u_id
+        self.diaryname = None
 
     def date_str(self):
         return self.date.strftime('%m-%d-%Y %H:%M')
+
+    def serialize(self):
+        return {
+            'diaryname': self.diaryname,
+            'id': self.id,
+            'text': self.text,
+            'date': self.date,
+            'username': self.username,
+            'u_id': self.u_id
+        }
