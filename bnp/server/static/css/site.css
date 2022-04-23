@@ -87,6 +87,10 @@ label {
     max-width: 100%;
 }
 
+.login-style {
+    width: 250px;
+}
+
 .my-diaries {
     font-weight: bold;
 }
@@ -137,4 +141,8 @@ label {
 
 .man-in {
     width: 400px;
+}
+
+#append-diary {
+    margin-bottom: 30px;
 }
