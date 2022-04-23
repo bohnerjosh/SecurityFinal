@@ -28,23 +28,24 @@
 
 </div>
 </div>
-<div class="row justify-content-center">
-<div class="col-xs-6 rounded options-div content-bg">
-<div class="row">
-<!-- FIXME: Add an IF statement here so when other people visit they can't create posts --!>
-<div class="option-l col-xs-12 across justify-content-center">
-<form class="form-inline mx-2 my-2" action="{{ url_for('log_diary') }}">
-<button class="btn btn-dark mx-auto" type=submit>Log a Diary - What's on your mind?</button>
-</form>
-</div>
-<div class="option-r col-xs-12 across justify-content-center">
-<form class="form-inline my-2" action="{{ url_for('get_key_management') }}">
-<button class="btn btn-dark mx-auto" type=submit>Diary Key management</button>
-</form>
-</div>
-</div>
-</div>
-</div>
+{% if login_profile %}
+    <div class="row justify-content-center">
+    <div class="col-xs-6 rounded options-div content-bg">
+    <div class="row">
+    <div class="option-l col-xs-12 across justify-content-center">
+        <form class="form-inline mx-2 my-2" action="{{ url_for('log_diary') }}">
+            <button class="btn btn-dark mx-auto" type=submit>Log a Diary - What's on your mind?</button>
+        </form>
+    </div>
+    <div class="option-r col-xs-12 across justify-content-center">
+        <form class="form-inline my-2" action="{{ url_for('get_key_management') }}">
+            <button class="btn btn-dark mx-auto" type=submit>Diary Key management</button>
+        </form>
+    </div>
+    </div>
+    </div>
+    </div>
+{% endif %}
 <div class="row justify-content-center align-items-center">
 <div class="col-xl-5 options-div rounded content-bg justify-content-center align-items-center">
         <h2 class="dark my-diaries text-center"><u>My Private Diaries</u></h2>
