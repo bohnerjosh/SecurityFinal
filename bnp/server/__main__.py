@@ -240,6 +240,16 @@ def website_log_entry(diarykey, text, username):
     date = datetime.now()
     diary.add_entry(text, date, username)
 
+def get_diaries_from_nologinuser(username):
+    config = Config(SERVER_CONFIG_ROOT)
+    diary_objs = config.get_diaries()[0]
+    usr_diary_objs = [d for d in diary_objs if d.written_by_usr(username)]
+    d_names = [get_diaryname_from_key(d.name) for d in diary_objs]
+    d_key_lst = [k.name for k in diary_objs]
+    
+    diaries = dict(zip(d_names, d_key_lst))
+    return diaries
+
 def init_session(username):
     config = Config(SERVER_CONFIG_ROOT)
     diary_objs = config.get_diaries()[0]
@@ -300,15 +310,29 @@ def main_diary_entries():
 def get_public_profile_diaries():
     # get the username if passed one. 
     # This is for visiting other people's profiles
-    
-    username = get_current_profile().username
-    if 'profile_name' in request.args:
-        username = request.args.get('profile_name')
+    logged_in = True    
+
+    profile = get_current_profile()
+    if not profile:
+        logged_in = False
+    else:
+        username = profile.username
+
+    if 'profile_id' in request.args:
+        profile_id = request.args.get('profile_id')
+        profile = Profile.query.get(profile_id)
+        username = profile.username
+ 
     config = Config(SERVER_CONFIG_ROOT)
-    diaries = session['keys'].keys()
+    if logged_in:
+        diaries = session['keys']
+
+    else:
+        diaries = get_diaries_from_nologinuser(profile.username)
+    
     entries_lst = []
     for diary in diaries:
-        diaryname = session['keys'][diary]
+        diaryname = diaries[diary]
         diary_obj = DiaryFactory.get_diary(diaryname, config)
         entries = diary_obj.get_entries(username)
         for entry in entries:

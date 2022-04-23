@@ -24,7 +24,7 @@ function getDiaries() {
 function insertEntry(entry) {
     var entryhtml = $('<div class="entry p-2 rounded" entryid="' + entry.id + '"></div>');
     entryhtml.append('<div class="entry-head">From diary ' + entry.diaryname + '</div>');
-    entryhtml.append('<div class="entry-author">Submitted by <a href="/profile/?profile">' 
+    entryhtml.append('<div class="entry-author">Submitted by <a href="/profile/' + entry.u_id + '">' 
         + entry.username + '</a> @ ' + entry.date + ' (#' + entry.id + ')</div>');
 
     entryhtml.append('<hr class="line" size="8" width="100%" color="dark">');
@@ -34,8 +34,4 @@ function insertEntry(entry) {
 
 $(function() {
     getDiaries();
-    $('append-diary').click(function(event) {
-        event.preventDefault();
-        getPosts();    
-    });
 });
