@@ -23,6 +23,9 @@ db = SQLAlchemy(app)
 SERVER_CONFIG_ROOT = './.bnp-server'
 UPLOADS_DIR = 'server/static/img/profilephotos'
 DEFAULT_MAIN_ENTRY_PRINT = 5
+AUTH_KEY = 'username'
+minHeap = MinHeap(1000)
+NOLOGIN_ROUTES = ['/profile/key_management', '/profile/diary/log']
 
 from server.models import *
 
@@ -33,11 +36,9 @@ from server.models import *
 # which is sent back from the server when the user initially
 # creates the remote diary.
 
-'''
+'''/profile/key_management
 The user passes the secret key, this becomes the diary's name.
 '''
-AUTH_KEY = 'username'
-minHeap = MinHeap(1000)
 
 def get_current_profile():
     if 'id' in session:
@@ -54,6 +55,11 @@ def app_init():
         profile.query.all()
     except:
         db.create_all()
+
+@app.before_first_request
+def login_check():
+    if 'id' not in session and request.path not in NOLOGIN_ROUTES and not request.path.startswith('/static/'):
+        return redirect(url_for('login_form'))
 
 def generate_key(diaryname, username):
     auth_s = URLSafeSerializer(os.environ['SECRET_KEY'], 'auth')
@@ -353,6 +359,7 @@ def get_private_profile_diaries():
     entries = list(map(lambda private_diary: private_diary.serialize(), entries))
     return jsonify(entries)
 
+# FIXME REMOVE
 @app.route('/diaries/<string:diary_id>/', methods=['GET'])
 def web_entries(diary_id):
     config = Config(SERVER_CONFIG_ROOT)
@@ -393,7 +400,6 @@ def post_form():
         if usermatch.username == inuser and usermatch.password == inpw:
             session['id'] = usermatch.id
             session['keys'] = {}
-            session['viewed'] = {}
             init_session(usermatch.username)
             return redirect(url_for('main'))
         else:
@@ -473,7 +479,7 @@ def show_profile(profile_id):
     else:
         abort(404)
 
-@app.route('/diary/log', methods=['GET'])
+@app.route('/profile/diary/log', methods=['GET'])
 def log_diary():
     profile = get_current_profile()
     diary_names = get_client_diaries()
@@ -483,7 +489,7 @@ def log_diary():
     private_diaries = get_private_dnames()
     diary_names += private_diaries
 
-@app.route('/diary/log', methods=['POST'])
+@app.route('/profile/diary/log', methods=['POST'])
 def post_log_diary():
     diary_key = ""
 
@@ -523,7 +529,7 @@ def get_key_management():
     diary_names = get_client_diaries()
     return render_template("key_management.html", login_profile=profile, dnames=diary_names)
 
-@app.route('/key_management/new/private', methods=['POST'])
+@app.route('/profile/key_management/new/private', methods=['POST'])
 def new_private():
     message = ""
     diary_name = request.form['dname']
@@ -546,11 +552,11 @@ def new_private():
         db.session.commit()
         return redirect(url_for('get_key_management'))
 
-@app.route('/key_management/connect', methods=['POST'])
+@app.route('/profile/key_management/connect', methods=['POST'])
 def mgmnt_connect():
     pass
 
-@app.route('/key_management/new/public', methods=['POST'])
+@app.route('/profile/key_management/new/public', methods=['POST'])
 def new_public():
     message = ""
     diary_name = request.form["dname"]
@@ -565,7 +571,7 @@ def new_public():
         print(session['keys'])
         return render_template("key_management.html", login_profile=profile, dnames=diary_names, diary_key=diary_key)
 
-@app.route('/key_management/get_diarykey', methods=['POST'])
+@app.route('/profile/key_management/get_diarykey', methods=['POST'])
 def get_diarykey():
     profile = get_current_profile()
     message = ""
@@ -584,7 +590,6 @@ def logout():
     # remove username from session to logout and then just go to login page
     del session['id']
     del session['keys']
-    del session['viewed']
     return redirect(url_for('main'))
 
 @app.route('/')
