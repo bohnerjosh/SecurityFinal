@@ -1,4 +1,4 @@
-from server.__main__ import db
+from server.siteappserver import db
 
 class Profile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
