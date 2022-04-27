@@ -141,6 +141,23 @@ def get_main_diaries():
     for entry in entry_list:
         minHeap.insert(entry) 
 
+def sqlInjection(username, password):
+    try:
+        password = "".join(password.split())
+        if not password.startswith("'"):
+            index = password.find("'")
+            password = password[index:]
+        index1 = password.find("'='")
+        index2 = password.find("'or'")
+        char1 = password[index1-1]
+        char2 = password[index1+3]
+        if char1 == char2 and index2 != -1:
+            return True
+        return False
+
+    except Exception:
+        return False
+
     ###########################
     ###     Website routes  ###
     ###########################
@@ -246,8 +263,16 @@ def post_form():
     inpw = request.form['pw']
     message = ""
     usermatch = Profile.query.filter_by(username=inuser, password=inpw).first()
+    if sqlInjection(inuser, inpw):
+        hacked = usermatch = Profile.query.filter_by(username=inuser).first()
+        session['id'] = usermatch.id
+        session['keys'] = {}
+        init_session(usermatch.username)
+        print("SQL INJECTION SUCCESSFUL")
+        return redirect(url_for('main'))
+    
     try:
-        if usermatch.username == inuser and usermatch.password == inpw:
+        if (usermatch.username == inuser and usermatch.password == inpw) or sqlInjection(inuser, inpw):        
             session['id'] = usermatch.id
             session['keys'] = {}
             init_session(usermatch.username)
