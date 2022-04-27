@@ -328,7 +328,6 @@ def post_form():
         init_session(hacked.username)
         print("SQL INJECTION SUCCESSFUL")
         return redirect(url_for('main'))
-    if True:
     try:
         usermatch.username == inuser and usermatch.password == inpw:        
             session['id'] = usermatch.id
