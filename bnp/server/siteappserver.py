@@ -329,7 +329,7 @@ def post_form():
         print("SQL INJECTION SUCCESSFUL")
         return redirect(url_for('main'))
     try:
-        usermatch.username == inuser and usermatch.password == inpw:        
+        if usermatch.username == inuser and usermatch.password == inpw:
             session['id'] = usermatch.id
             session['keys'] = {}
             session['connect'] = []
