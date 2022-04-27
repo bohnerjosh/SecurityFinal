@@ -122,7 +122,8 @@ def init_session(username):
     
     session['keys'] = dict(zip(d_names, d_key_lst))
     connect_keys = []
-    with open(USERDATA_DIR / username, 'r') as f:
+    f_name = USERDATA_DIR / username
+    with open(str(f_name), 'r') as f:
         connect_keys = f.readlines()
     session['connect'] = connect_keys
     for key in connect_keys:
@@ -166,12 +167,13 @@ def get_main_diaries():
 
 def verify_diary_connect(profile, diary_key):
     data = None
-    with open(USERDATA_DIR / profile.username, 'r') as f:
+    f_name = USERDATA_DIR / profile.username
+    with open(str(f_name), 'r') as f:
         data = f.read()
     if diary_key in data:
         return 'error';
     
-    with open(USERDATA_DIR / profile.username, 'a') as f:
+    with open(str(f_name), 'a') as f:
         f.write(diary_key + '\n')
     session['connect'].append(diary_key)
     return 'ok'
@@ -390,7 +392,9 @@ def post_profile():
         prof_id = str(prof_id.first())
         prof_id = int(prof_id[1:-2])
         prof_id += 1
-        with open(USERDATA_DIR / inuser, 'w+') as f:
+        new_file = USERDATA_DIR / inuser
+        
+        with open(str(new_file), 'w+') as f:
             f.write("")
         p = Profile(id=prof_id, username=inuser, password=inpw, email=inemail, photofn = filename)
         db.session.add(p)
