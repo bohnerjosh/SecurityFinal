@@ -128,7 +128,10 @@ def get_main_diaries():
     diaries = config.get_diaries()[0]
     entry_list = []
     for diary in diaries:
-        name = get_diaryname_from_key(diary.name)
+        try:
+            name = get_diaryname_from_key(diary.name)
+        except:
+            return
         entries = diary.get_entries()
         for entry in entries:
             entry.diaryname = name
