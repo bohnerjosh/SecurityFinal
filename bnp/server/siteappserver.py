@@ -22,10 +22,12 @@ db = SQLAlchemy(app)
 
 SERVER_CONFIG_ROOT = './.bnp-server'
 UPLOADS_DIR = 'server/static/img/profilephotos'
+USERDATA_DIR = Path('server/static/userdata')
 DEFAULT_MAIN_ENTRY_PRINT = 5
 AUTH_KEY = 'username'
 minHeap = MinHeap(1000)
 NOLOGIN_ROUTES = ['/profile/key_management', '/profile/diary/log']
+INIT_MESSAGE = "Just created a new Diary!"
 
 from server.models import *
 
@@ -102,6 +104,15 @@ def get_diaries_from_nologinuser(username):
     diaries = dict(zip(d_names, d_key_lst))
     return diaries
 
+def re_get_session(username):
+    config = Config(SERVER_CONFIG_ROOT)
+    diary_objs = config.get_diaries()[0]
+    usr_diary_objs = [d for d in diary_objs if d.written_by_usr(username)]
+    d_names = [get_diaryname_from_key(d.name) for d in diary_objs]
+    d_key_lst = [k.name for k in diary_objs]
+    
+    session['keys'] = dict(zip(d_names, d_key_lst))
+
 def init_session(username):
     config = Config(SERVER_CONFIG_ROOT)
     diary_objs = config.get_diaries()[0]
@@ -110,14 +121,23 @@ def init_session(username):
     d_key_lst = [k.name for k in diary_objs]
     
     session['keys'] = dict(zip(d_names, d_key_lst))
-   
+    connect_keys = []
+    with open(USERDATA_DIR / username, 'r') as f:
+        connect_keys = f.readlines()
+    session['connect'] = connect_keys
+    for key in connect_keys:
+        dname = get_diaryname_from_key(key)
+        session['keys'][dname] = key
+ 
 def get_private_dnames():
     u_id = get_current_profile().id
     diaries = PrivateDiary.query.filter_by(profile_id=u_id).all()
     dnames = [d.name for d in diaries]
     return dnames
 
-def get_client_diaries():
+def get_client_diaries(profile):
+    re_get_session(profile.username)
+    
     diary_names = list(session['keys'].keys())
     private_diaries = get_private_dnames()
     diary_names += private_diaries
@@ -131,7 +151,7 @@ def get_main_diaries():
         try:
             name = get_diaryname_from_key(diary.name)
         except:
-            return
+            continue
         entries = diary.get_entries()
         for entry in entries:
             entry.diaryname = name
@@ -142,7 +162,36 @@ def get_main_diaries():
         entry_list += entries
             
     for entry in entry_list:
-        minHeap.insert(entry) 
+        minHeap.insert(entry)
+
+def verify_diary_connect(profile, diary_key):
+    data = None
+    with open(USERDATA_DIR / profile.username, 'r') as f:
+        data = f.read()
+    if diary_key in data:
+        return 'error';
+    
+    with open(USERDATA_DIR / profile.username, 'a') as f:
+        f.write(diary_key + '\n')
+    session['connect'].append(diary_key)
+    return 'ok'
+
+def create_init_entry(profile, diary_key):
+    config = Config(SERVER_CONFIG_ROOT)
+    diary = DiaryFactory.get_diary(diary_key, config)
+
+    date = datetime.now()
+    diary.add_entry(INIT_MESSAGE, date, profile.username)
+
+def verify_diarykey(key):
+    config = Config(SERVER_CONFIG_ROOT)
+    try:
+        if config.has_diary(name=key):
+            return "ok"
+        
+        return "Error"
+    except:
+        return "Error"
 
 def sqlInjection(username, password):
     try:
@@ -190,6 +239,8 @@ def main_diary_entries():
     else:
         size = DEFAULT_MAIN_ENTRY_PRINT
     entry_lst = [minHeap.getMin().serialize() for i in range(size)]
+    entry_lst.reverse()
+
     return jsonify(entry_lst)
     
 @app.route('/api/get_public_profile_diaries/', methods=['GET'])
@@ -267,21 +318,26 @@ def post_form():
     message = ""
     usermatch = Profile.query.filter_by(username=inuser, password=inpw).first()
     if sqlInjection(inuser, inpw):
-        hacked = usermatch = Profile.query.filter_by(username=inuser).first()
-        session['id'] = usermatch.id
+        hacked = Profile.query.filter_by(username=inuser).first()
+        session['id'] = hacked.id
         session['keys'] = {}
-        init_session(usermatch.username)
+        session['connect'] = []
+        init_session(hacked.username)
         print("SQL INJECTION SUCCESSFUL")
         return redirect(url_for('main'))
     
     try:
-        if (usermatch.username == inuser and usermatch.password == inpw) or sqlInjection(inuser, inpw):        
+        print("AA")
+        print(usermatch)
+        if usermatch.username == inuser and usermatch.password == inpw:        
+            print("CC")
             session['id'] = usermatch.id
             session['keys'] = {}
+            session['connect'] = []
             init_session(usermatch.username)
             return redirect(url_for('main'))
         else:
-        
+            print("BB") 
             message = "Invalid username/password combination."
             return render_template('login.html', message=message)
     except:
@@ -334,6 +390,8 @@ def post_profile():
         prof_id = str(prof_id.first())
         prof_id = int(prof_id[1:-2])
         prof_id += 1
+        with open(USERDATA_DIR / inuser, 'w+') as f:
+            f.write("")
         p = Profile(id=prof_id, username=inuser, password=inpw, email=inemail, photofn = filename)
         db.session.add(p)
         db.session.commit() 
@@ -360,7 +418,7 @@ def show_profile(profile_id):
 @app.route('/profile/diary/log', methods=['GET'])
 def log_diary():
     profile = get_current_profile()
-    diary_names = get_client_diaries()
+    diary_names = get_client_diaries(profile)
     return render_template("createpost.html", login_profile=profile, dnames=diary_names) 
 
     diary_names = session['keys'].keys()
@@ -404,7 +462,7 @@ def post_log_diary():
 @app.route('/profile/key_management', methods=['GET'])
 def get_key_management():
     profile = get_current_profile()
-    diary_names = get_client_diaries()
+    diary_names = get_client_diaries(profile)
     return render_template("key_management.html", login_profile=profile, dnames=diary_names)
 
 @app.route('/profile/key_management/new/private', methods=['POST'])
@@ -419,7 +477,7 @@ def new_private():
         elif diary_name == "":
             message = "Diary name cannot be blank"
 
-        diary_names = get_client_diaries()
+        diary_names = get_client_diaries(profile)
         return render_template("key_management.html", login_profile=profile, dnames=diary_names, message=message)
     except:
         date = datetime.now()
@@ -430,9 +488,37 @@ def new_private():
         db.session.commit()
         return redirect(url_for('get_key_management'))
 
+
+@app.route('/profile/key_management/connect', methods=['GET'])
+def get_connect():
+    profile = get_current_profile()
+    return render_template("connect.html", login_profile=profile)
+
 @app.route('/profile/key_management/connect', methods=['POST'])
 def mgmnt_connect():
-    pass
+    
+    profile = get_current_profile()
+    message = ""
+    showError = False
+    diary_names = get_client_diaries(profile)
+    
+    diary_key = request.form["key"]
+    result = verify_diarykey(diary_key)
+    if result == "Error":
+        showError = True
+        message = "The diary associated with that key does not exist"
+        return render_template("connect.html", login_profile=profile, dnames=diary_names, message=message)
+    
+    result = verify_diary_connect(profile, diary_key)
+
+    if result == "Error":
+        showError = True
+        message = "That diary already exists locally. To add more users to a diary, create a new account."
+    
+    if showError: 
+        return render_template("connect.html", login_profile=profile, dnames=diary_names, message=message)
+
+    return redirect(url_for('get_key_management'))
 
 @app.route('/profile/key_management/new/public', methods=['POST'])
 def new_public():
@@ -441,23 +527,26 @@ def new_public():
     profile = get_current_profile()
     status, message = verify_diary_creation(diary_name, profile.username)
     
-    diary_names = get_client_diaries()
+    diary_names = get_client_diaries(profile)
     if status == 'error':
         return render_template("key_management.html", login_profile=profile, dnames=diary_names, message=message)
     else:
         diary_key = message
-        print(session['keys'])
+
+        create_init_entry(profile, diary_key)
+
         return render_template("key_management.html", login_profile=profile, dnames=diary_names, diary_key=diary_key)
 
 @app.route('/profile/key_management/get_diarykey', methods=['POST'])
 def get_diarykey():
     profile = get_current_profile()
     message = ""
-    diary_names = session['keys'].keys()
+    diary_names = get_client_diaries(profile)
+
     diary_name = request.form["diaryname"]
     if diary_name in session['keys']:
-        print(session['keys'])
         diary_key = session['keys'][diary_name]
+
         return render_template("key_management.html", login_profile=profile, dnames=diary_names, diary_key=diary_key)
     else:
         message = "invalid diary name or it is a private diary"
@@ -468,6 +557,7 @@ def logout():
     # remove username from session to logout and then just go to login page
     del session['id']
     del session['keys']
+    del session['connect']
     return redirect(url_for('main'))
 
 @app.route('/')
