@@ -329,8 +329,8 @@ def post_form():
         print("SQL INJECTION SUCCESSFUL")
         return redirect(url_for('main'))
     if True:
-    #try:
-        if usermatch.username == inuser and usermatch.password == inpw:        
+    try:
+        usermatch.username == inuser and usermatch.password == inpw:        
             session['id'] = usermatch.id
             session['keys'] = {}
             session['connect'] = []
@@ -340,7 +340,7 @@ def post_form():
             print("BB") 
             message = "Invalid username/password combination."
             return render_template('login.html', message=message)
-    #except:
+    except:
         message = "Invalid username/password combination."
     return render_template('login.html', message=message)
 
