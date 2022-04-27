@@ -108,8 +108,8 @@ def re_get_session(username):
     config = Config(SERVER_CONFIG_ROOT)
     diary_objs = config.get_diaries()[0]
     usr_diary_objs = [d for d in diary_objs if d.written_by_usr(username)]
-    d_names = [get_diaryname_from_key(d.name) for d in diary_objs]
-    d_key_lst = [k.name for k in diary_objs]
+    d_names = [get_diaryname_from_key(d.name) for d in usr_diary_objs]
+    d_key_lst = [k.name for k in usr_diary_objs]
     
     session['keys'] = dict(zip(d_names, d_key_lst))
 
@@ -117,20 +117,24 @@ def init_session(username):
     config = Config(SERVER_CONFIG_ROOT)
     diary_objs = config.get_diaries()[0]
     usr_diary_objs = [d for d in diary_objs if d.written_by_usr(username)]
-    d_names = [get_diaryname_from_key(d.name) for d in diary_objs]
-    d_key_lst = [k.name for k in diary_objs]
+    d_names = [get_diaryname_from_key(d.name) for d in usr_diary_objs]
+    d_key_lst = [k.name for k in usr_diary_objs]
     
     session['keys'] = dict(zip(d_names, d_key_lst))
+    get_connect_diaries(username)
+
+def get_connect_diaries(username):
     connect_keys = []
     f_name = USERDATA_DIR / username
     with open(str(f_name), 'r') as f:
         connect_keys = f.readlines()
-    session['connect'] = connect_keys
     for key in connect_keys:
         key = "".join(key.split())
         dname = get_diaryname_from_key(key)
         session['keys'][dname] = key
- 
+
+    session['connect'] = connect_keys
+
 def get_private_dnames():
     u_id = get_current_profile().id
     diaries = PrivateDiary.query.filter_by(profile_id=u_id).all()
@@ -139,10 +143,17 @@ def get_private_dnames():
 
 def get_client_diaries(profile):
     re_get_session(profile.username)
-    
+    get_connect_diaries(profile.username)
+ 
     diary_names = list(session['keys'].keys())
     private_diaries = get_private_dnames()
     diary_names += private_diaries
+    return diary_names
+
+def get_client_public_diaries(profile):
+    re_get_session(profile.username)
+    diary_names = list(session['keys'].keys())
+    get_connect_diaries(profile.username)
     return diary_names
 
 def get_main_diaries():
@@ -265,8 +276,8 @@ def get_public_profile_diaries():
  
     config = Config(SERVER_CONFIG_ROOT)
     if logged_in:
+        get_client_public_diaries(profile)
         diaries = session['keys']
-
     else:
         diaries = get_diaries_from_nologinuser(profile.username)
     
