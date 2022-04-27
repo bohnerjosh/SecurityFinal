@@ -16,42 +16,44 @@
             {% endfor %}
 
     <div class="row justify-content-center">
-        <div class="col-l-8 content-bg management-col rounded">
-            <form action="{{ url_for('mgmnt_connect') }}" class="justify-content-center" method="POST">
+        <div class="col-l-8 content-bg management-col rounded p-3">
+            <form action="{{ url_for('get_connect') }}" class="justify-content-center" method="GET">
                 <div class="form-group">
-                    <label for="key" class="">Connect to a friend's diary via Diarykey</label>
-                    <input type="text" class="form-control man-in" name="key" placeholder="Diarykey here...">
-                    <button class="btn btn-dark mx-auto" type=submit>Submit</button>
+                    <p class="text-center dark">Connect to a friend's diary with a diarykey and url</p>
+                    <button class="btn btn-dark mx-auto" type=submit>Go</button>
                 </div>
             </form>
 
         </div>
 
-        <div class="col-l-8 rounded content-bg management-col">
+        <div class="col-l-8 rounded content-bg management-col p-3">
             <form action="{{ url_for('new_public') }}" method="POST">
                 <div class="form-group ">
                     <label for="dname" class="text-center">Create a new public diary</label>
                     <input type="text" class="form-control man-in" name="dname" placeholder="Diary Name here...">
-                    <button class="btn btn-dark mx-auto" type=submit>Submit</button>
+                   
                 </div>
+                 <button class="btn btn-dark mx-auto" type=submit>Submit</button>
             </form>
         </div>
-        <div class="col-l-8 rounded content-bg management-col">
+        <div class="col-l-8 rounded content-bg management-col p-3">
             <form action="{{ url_for('new_private') }}" method="POST">
                 <div class="form-group ">
                     <label for="dname" class="text-center">Create a new private diary</label>
                     <input type="text" class="form-control man-in" name="dname" placeholder="Diary Name here...">
-                    <button class="btn btn-dark mx-auto" type=submit>Submit</button>
+                    
                 </div>
+                <button class="btn btn-dark mx-auto" type=submit>Submit</button>
             </form>
         </div>
-        <div class="col-l-8 rounded content-bg management-col">
+        <div class="col-l-8 rounded content-bg management-col p-3">
             <form action="{{ url_for('get_diarykey') }}" method="POST">
                 <div class="form-group">
                     <label for="diaryname" class="text-center">Get a diarykey to share</label>
                     <input type="text" class="form-control man-in" name="diaryname" placeholder="Enter diary name">
-                    <button class="btn btn-dark mx-auto" type=submit>Submit</button>
+                    
                 </div>
+                    <button class="btn btn-dark mx-auto" type=submit>Submit</button>
             </form>
         </div>
         <div id="diarykey-place" class="dark text-center">

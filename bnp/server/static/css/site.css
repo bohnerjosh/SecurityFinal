@@ -18,6 +18,7 @@
 
 .main-entries {
     margin-top: 50px;
+    margin-bottom: 20px;
 }
 
 .login-btn {
@@ -145,4 +146,8 @@ label {
 
 #append-diary {
     margin-bottom: 30px;
+}
+
+.filler {
+    margin: 2px;
 }
