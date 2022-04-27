@@ -127,6 +127,7 @@ def init_session(username):
         connect_keys = f.readlines()
     session['connect'] = connect_keys
     for key in connect_keys:
+        key = "".join(key.split())
         dname = get_diaryname_from_key(key)
         session['keys'][dname] = key
  
@@ -327,12 +328,9 @@ def post_form():
         init_session(hacked.username)
         print("SQL INJECTION SUCCESSFUL")
         return redirect(url_for('main'))
-    
-    try:
-        print("AA")
-        print(usermatch)
+    if True:
+    #try:
         if usermatch.username == inuser and usermatch.password == inpw:        
-            print("CC")
             session['id'] = usermatch.id
             session['keys'] = {}
             session['connect'] = []
@@ -342,7 +340,7 @@ def post_form():
             print("BB") 
             message = "Invalid username/password combination."
             return render_template('login.html', message=message)
-    except:
+    #except:
         message = "Invalid username/password combination."
     return render_template('login.html', message=message)
 
