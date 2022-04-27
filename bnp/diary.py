@@ -12,7 +12,6 @@ __all__ = ['DiaryException', 'DiaryFactory', 'Entry',
 
 REMOTE_DIARY_FNAME = 'remote'
 
-
 class DiaryException(Exception):
     pass
 

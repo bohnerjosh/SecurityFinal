@@ -97,11 +97,11 @@ class Config(object):
                 else:
                     local_diaries.append(a_diary)
         diaries = [local_diaries, remote_diaries]
+        
         return diaries
 
     def has_diary(self, **kwargs):
         self.check_invalid()
-
         diary_name = ''
         if 'diary' in kwargs:
             diary_name = kwargs['diary'].name
@@ -112,7 +112,6 @@ class Config(object):
                 'Internal error: attempt to check for existence of ' +
                 'a diary without specifying its name'
             )
-
         if diary_name:
             return (self.basepath / diary_name).exists()
 
