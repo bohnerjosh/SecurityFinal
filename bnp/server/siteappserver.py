@@ -253,7 +253,6 @@ def main_diary_entries():
     else:
         size = DEFAULT_MAIN_ENTRY_PRINT
     entry_lst = [minHeap.getMin().serialize() for i in range(size)]
-    entry_lst.reverse()
 
     return jsonify(entry_lst)
     

@@ -21,11 +21,10 @@ class MinHeap:
 
     def heapsort_bottom(self, index):
         parent_node = (index - 1) // 2
-        print(parent_node)
         if parent_node < 0:
             parent_node = 0
 
-        if self.Heap[parent_node].date > self.Heap[index].date:
+        if self.Heap[parent_node].date < self.Heap[index].date:
             temp = self.Heap[parent_node]
             self.Heap[parent_node] = self.Heap[index]
             self.Heap[index] = temp
@@ -46,13 +45,13 @@ class MinHeap:
             right = -1
 
         # if not balanced, min is set
-        if left != -1 and self.Heap[left].date < self.Heap[parent_node].date:
+        if left != -1 and self.Heap[left].date > self.Heap[parent_node].date:
             _min = left
 
         else:
             _min = parent_node
 
-        if right != -1 and self.Heap[right].date < self.Heap[_min].date:
+        if right != -1 and self.Heap[right].date > self.Heap[_min].date:
             _min = right
 
         # recursive check for balance and sort
