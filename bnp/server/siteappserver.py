@@ -233,6 +233,8 @@ def app_init():
     imgdir = Path(UPLOADS_DIR)
     if not imgdir.exists():
         imgdir.mkdir(parents=True)
+    if not USERDATA_DIR.exists():
+        USERDATA_DIR.mkdir()
     try:
         profile.query.all()
     except:
