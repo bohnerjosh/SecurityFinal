@@ -21,9 +21,14 @@ def process_text():
     cowtext = ""
     user_input = request.form["input_text"]
     os.system(f"cowsay {user_input} > out.txt")
-    with open("out.txt", "r") as f:
-        cowtext = f.read()
-    os.remove("out.txt")
+    try:
+        with open("out.txt", "r") as f:
+            cowtext = f.read()
+        os.remove("out.txt")
+    except:
+        message = "invalid input passed to cowsay"
+        return render_template("cow.html", cowtext = "", message=message)
+    
     return render_template("cow.html", cowtext = cowtext)
 
 @app.route("/sent")

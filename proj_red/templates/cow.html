@@ -71,6 +71,11 @@
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
+        <div class="justify-content-center alert alert-danger">
+        {% if message %}
+            {{ message }}
+        {% endif %}
+        </div>
     </div>
 </div> 
 </div>
